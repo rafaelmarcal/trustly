@@ -1,4 +1,4 @@
-# trustly
+# Trustly Challenge
 
 # challenge1\api.html
 
@@ -20,7 +20,7 @@
     java TrustlyChallenge2
 
     A Docker container can be installed with a JDK image, compile and run with
-    these commands inside directory challenge2:
+    these commands inside challenge2 directory:
     
     docker build -t trustly-challenge-2 .
     docker run -it -p 8020:8020 --rm --name trustlychallenge trustly-challenge-2
