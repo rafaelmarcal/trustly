@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8"> 
+    <meta name="description" content="Trustly Technical Challenge - System Integration Engineer">
+    <meta name="keywords" content="HTML, CSS, JavaScript, API Call">
+    <meta name="author" content="Rafael Marshall">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- This page needs to be accessed via file or http, as the API service runs under http or https with an invalid certificate. 
+    
+      To use the HTTPS connection, it is necessary to ignore the certificate validation using some server side consumption
+      and then making the data available in JSON again, in the same application domain.
+      Without this additional step, unsafe connection warning may arise or the connection may be blocked by security policies in some browsers
+      that prevent the use of crossdomain calls in these cases. The use of calls from different sources or protocols 
+      requires additional configuration of the web server to allow this to happen.
+    
+      See this page online and running @ http://rafaelmarcal.com/trustly/api.html -->
+
+<title>Trustly Technical Challenge</title>
+
+
+
+<style>
+
+/* Just a little Flexbox and CSS to centralize all DOM elements and look like an app */
+
+html, body, .content { width: 100%; height: 100%; display: flex; justify-content: center;  align-items: center; flex-direction: column; }
+
+#country-flag {padding-bottom: 10px;}
+#city {padding-bottom: 10px;}
+#select-city {padding-top: 20px;}
+
+</style>
+
+
+
+</head>
+<body>
+
+    <div class="content">
+
+      <div id="country-flag">
+        
+      </div>
+
+      <div id="city">
+
+      </div>
+
+      <div id="time">
+        14:00
+      </div>
+
+      <div id="select-city">
+      <select name="cities" id="cities">
+
+        <option value="WEST SE">Stockholm, Sweden - Trustly Headquarters</option>
+        <option value="ESAST BR">Vitória, Brazil - Trustly Office</option>
+        <option value="EST US">New York, United States</option>
+        <option value="RST FR">Paris, France</option>
+
+      </select>
+    </div>
+
+    </div>
+
+    <script>
+
+/* Wait for DOM components to be loaded to manipulate them */
+
+  document.addEventListener('DOMContentLoaded', (event) => {
+
+    /* Pull default information */
+
+    getTime("WEST")
+    getFlag("SE")
+    
+
+
+    /* Wait for city selection */
+    const cities = document.getElementById('cities')
+    
+    cities.addEventListener('change', (event) => {
+
+      var result = event.target.value.split(' ') /* Get the Timezone code e Country Code and call the functions to load data from API services */
+    
+      getTime(result[0])
+      getFlag(result[1])
+
+    }); 
+
+
+  }); 
+
+
+    function getTime(tz) {
+
+    /* Call api based on the selected city combo */
+
+
+      fetch('http://worldclockapi.com/api/json/'+tz+'/now').then(response => response.json()).then(function(response) {
+        datetimeWidget(response['currentDateTime'])
+      });
+
+    }
+
+    
+    function datetimeWidget(datetimestr) {
+
+      var cityComponent = document.getElementById('city')
+      var timeComponent = document.getElementById('time')
+
+      /* We could use date functions here like Date() and parser according
+        to Locale and date format, but to avoid any incompatibility of Locale functions
+        and UCT formats, let's just get the time via regex. */
+
+
+
+      var time = datetimestr.match(/T(.*)[-+]/).pop() // Regex to get the time str only
+      var city = cities[cities.selectedIndex].textContent /* Selected option text */
+
+      cityComponent.innerHTML = city 
+      timeComponent.innerHTML = time 
+
+
+    }
+
+    function getFlag(cc) {
+
+      
+    /* Additionally, we will use the country flag of that city, based on the service https://www.countryflags.io/ */
+
+
+      const flagComponent = document.getElementById('country-flag')
+
+      flagComponent.innerHTML = "<img src=https://www.countryflags.io/"+cc+"/shiny/64.png>"
+
+
+
+    }
+
+    </script>
+
+</body>
+</html>
